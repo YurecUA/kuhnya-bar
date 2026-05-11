@@ -1,0 +1,13 @@
+<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <rect width="64" height="64" rx="12" fill="#1A3021"/>
+  <g transform="translate(6, 11) scale(0.47)" fill="#FCF9F1">
+    <rect x="3" y="4" width="104" height="3"/>
+    <rect x="3" y="93" width="104" height="2.5"/>
+    <text x="20" y="78" font-family="'Playfair Display', 'Times New Roman', serif" font-size="74" font-weight="700" text-anchor="middle">К</text>
+    <g transform="translate(110, 0) scale(-1, 1)">
+      <text x="20" y="78" font-family="'Playfair Display', 'Times New Roman', serif" font-size="74" font-weight="700" text-anchor="middle">К</text>
+    </g>
+    <rect x="53" y="22" width="4" height="13"/>
+    <path d="M 47 35 Q 47 32 50 32 L 60 32 Q 63 32 63 35 L 63 89 L 47 89 Z"/>
+  </g>
+</svg>
