@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Кухня та бар — Bar">
+<meta name="theme-color" content="#FCF9F1">
+<title>Кухня та бар — Bar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Source+Serif+Pro:wght@400;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --accent:      #1A3021;
+  --accent-dim:  #2a4632;
+  --accent-soft: #5F6F64;
+  --cream:       #FCF9F1;
+  --cream2:      #f5f1e6;
+  --cream3:      #e8e2d3;
+  --white:       #FFFFFF;
+  --text:        #000000;
+  --text-dim:    #595959;
+  --text-mute:   #707070;
+  --warn:        #640023;
+  --warn-soft:   #934D65;
+  --border:      rgba(95,111,100,0.25);
+  --shadow:      rgba(26,48,33,0.08);
+  --bubble-out:  #ffffff;
+  --bubble-in:   #ffffff;
+  --red:         #640023;
+  --red-dark:    #480018;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+html, body {
+  height: 100%; width: 100%;
+  background: var(--cream);
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+#app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: -webkit-fill-available;
+  max-width: 800px;
+  margin: 0 auto;
+  background: var(--cream);
+}
+
+/* ── HEADER ── */
+header {
+  flex-shrink: 0;
+  background: var(--accent);
+  border-bottom: 1px solid var(--accent-dim);
+  padding-top: env(safe-area-inset-top, 0px);
+  position: relative;
+  z-index: 10;
+  color: var(--cream);
+}
+
+.header-main {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 20px 12px;
+}
+
+.logo-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo-mark {
+  height: 44px;
+  width: 44px;
+  color: var(--cream);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.logo-mark svg { height: 100%; width: 100%; display: block; }
+.logo-text {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--cream);
+  letter-spacing: 0.01em;
+  font-style: italic;
+}
+
+.logo-info { display: flex; flex-direction: column; gap: 2px; }
+.dept-label {
+  font-family: 'Source Serif Pro', serif;
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(252,249,241,0.6);
+  margin-top: 2px;
+}
+
+.dept-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dept-pill {
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--cream);
+  padding: 5px 14px;
+  border-radius: 20px;
+}
+
+.online-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: #6ace7e;
+  box-shadow: 0 0 0 2px rgba(106,206,126,0.25);
+  animation: pulse 2.5s infinite;
+}
+@keyframes pulse {
+  0%,100% { opacity:1; }
+  50% { opacity:0.35; }
+}
+
+/* ── CHAT ── */
+#chat {
+  flex: 1;
+  overflow-y: auto;
+  padding: 18px 16px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  background:
+    linear-gradient(var(--cream) 0%, transparent 60px),
+    var(--cream);
+}
+#chat::-webkit-scrollbar { display: none; }
+
+.day-sep {
+  text-align: center;
+  font-size: 11px;
+  color: var(--text-mute);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin: 4px 0 10px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 300;
+}
+
+/* Bubbles */
+.msg {
+  display: flex;
+  flex-direction: column;
+  max-width: 82%;
+  animation: fadeUp 0.22s ease;
+}
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(7px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+.msg.out { align-self:flex-end; align-items:flex-end; }
+.msg.in  { align-self:flex-start; align-items:flex-start; }
+
+.bubble {
+  padding: 11px 15px;
+  border-radius: 16px;
+  line-height: 1.55;
+  font-size: 14.5px;
+  font-weight: 300;
+  word-break: break-word;
+  box-shadow: 0 1px 3px var(--shadow);
+}
+
+.msg.out .bubble {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-bottom-right-radius: 4px;
+  color: var(--text);
+}
+.msg.in .bubble {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-bottom-left-radius: 4px;
+}
+
+.msg-meta {
+  font-size: 11px;
+  color: var(--text-mute);
+  margin-top: 4px;
+  padding: 0 4px;
+  font-weight: 300;
+}
+
+/* Response card */
+.response-card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: 16px;
+  border-bottom-left-radius: 4px;
+  padding: 14px 16px;
+  box-shadow: 0 1px 4px var(--shadow);
+}
+
+.r-header {
+  font-family: 'Source Serif Pro', serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 11px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.order-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border);
+  gap: 10px;
+}
+.order-line:last-of-type { border-bottom: none; margin-bottom: 0; }
+
+.order-item { color: var(--text); flex:1; font-weight: 400; font-size: 14px; }
+.order-qty  {
+  color: var(--text);
+  font-weight: 600;
+  white-space: nowrap;
+  font-size: 14px;
+}
+
+.flag {
+  display: inline-block;
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 8px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-left: 6px;
+  font-family: 'Inter', sans-serif;
+}
+.flag.merged { background:rgba(52,152,219,0.1); color:#2980b9; border:1px solid rgba(52,152,219,0.25); }
+.flag.cross  { background:rgba(230,126,34,0.1); color:#d35400; border:1px solid rgba(230,126,34,0.25); }
+.flag.warn   { background:rgba(100,0,35,0.08); color:var(--warn); border:1px solid rgba(100,0,35,0.25); }
+
+.r-footer {
+  font-size: 12px;
+  color: var(--text-mute);
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+  font-weight: 300;
+}
+
+/* Typing */
+.typing {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 13px 16px;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  border-bottom-left-radius: 4px;
+  width: fit-content;
+}
+.typing span {
+  width: 6px; height: 6px;
+  background: var(--text-mute);
+  border-radius: 50%;
+  animation: bounce 1.1s infinite;
+}
+.typing span:nth-child(2) { animation-delay:0.18s; }
+.typing span:nth-child(3) { animation-delay:0.36s; }
+@keyframes bounce {
+  0%,60%,100% { transform:translateY(0); }
+  30% { transform:translateY(-5px); }
+}
+
+/* Confirm row */
+.confirm-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+.confirm-btn {
+  flex: 1;
+  padding: 10px 0;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--white);
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.confirm-btn.primary {
+  background: var(--accent);
+  color: var(--cream);
+  border-color: var(--accent);
+}
+.confirm-btn:active { opacity: 0.75; transform: scale(0.97); }
+
+/* ── INPUT BAR ── */
+#input-bar {
+  flex-shrink: 0;
+  background: var(--cream);
+  border-top: 1px solid var(--border);
+  padding: 12px 16px;
+  padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  box-shadow: 0 -2px 12px var(--shadow);
+}
+
+.input-hint {
+  font-size: 11px;
+  color: var(--text-mute);
+  margin-bottom: 8px;
+  font-weight: 300;
+  letter-spacing: 0.04em;
+}
+
+.input-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+#msg-input {
+  flex: 1;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 10px 16px;
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  font-weight: 300;
+  resize: none;
+  max-height: 100px;
+  outline: none;
+  transition: border-color 0.2s;
+  -webkit-appearance: none;
+  line-height: 1.4;
+}
+#msg-input::placeholder { color: var(--text-mute); }
+#msg-input:focus { border-color: var(--accent); background: var(--white); }
+
+/* V send button */
+#send-btn {
+  min-width: 110px;
+  height: 44px;
+  border-radius: 22px;
+  background: var(--accent);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-shrink: 0;
+  padding: 0 22px;
+  transition: background 0.2s, transform 0.1s;
+  box-shadow: 0 2px 8px rgba(26,48,33,0.18);
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--cream);
+  letter-spacing: 0.02em;
+}
+#send-btn:hover { background: var(--accent-dim); }
+#send-btn:active { transform:scale(0.97); background:var(--accent-dim); }
+
+/* Demo badge */
+.demo-tag {
+  font-size: 10px;
+  color: rgba(252,249,241,0.55);
+  border: 1px solid rgba(252,249,241,0.25);
+  border-radius: 8px;
+  padding: 2px 7px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 400;
+}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <header>
+    
+    <div class="header-main">
+      <div class="logo-wrap">
+        <div class="logo-mark">
+          <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-label="Кухня та бар">
+            <rect x="4" y="6" width="92" height="4" fill="currentColor"/>
+            <rect x="4" y="86" width="92" height="3" fill="currentColor"/>
+            <text x="22" y="68" font-family="'Playfair Display', serif" font-size="56" font-weight="700" fill="currentColor" text-anchor="middle">К</text>
+            <text x="78" y="68" font-family="'Playfair Display', serif" font-size="56" font-weight="700" fill="currentColor" text-anchor="middle">Л</text>
+            <g fill="currentColor">
+              <rect x="48" y="14" width="4" height="14" rx="0.5"/>
+              <path d="M 42 28 Q 42 25 45 25 L 55 25 Q 58 25 58 28 L 58 84 L 42 84 Z"/>
+            </g>
+          </svg>
+        </div>
+        <div class="logo-info">
+        <span class="logo-text">Кухня &amp; бар</span>
+        <div class="dept-label">Замовлення · Бар</div>
+        </div>
+      </div>
+      <div class="dept-badge">
+        <span class="demo-tag">demo</span>
+        <div class="dept-pill">Bar</div>
+        <div class="online-dot"></div>
+      </div>
+    </div>
+  </header>
+
+  <div id="chat">
+    <div class="day-sep" id="cur-date"></div>
+    <div class="msg in">
+      <div class="response-card">
+        <div class="r-header">Система · Бар</div>
+        Вітаємо в системі замовлень «Кухня та бар».<br>
+        Напишіть замовлення у вільному форматі.<br>
+        <span style="color:var(--text-mute);font-size:13px;font-weight:300;">
+          Напр.: 2 ящики джину, 6 пл. тоніку, 1 пл. рому
+        </span>
+      </div>
+      <div class="msg-meta">Система · щойно</div>
+    </div>
+  </div>
+
+  <div id="input-bar">
+    <div class="input-hint">Бар · напишіть замовлення у вільному форматі</div>
+    <div class="input-row">
+      <textarea id="msg-input"
+        placeholder="Напишіть замовлення…"
+        rows="1"
+        onkeydown="handleKey(event)"
+        oninput="autoResize(this)"></textarea>
+      <button id="send-btn" onclick="sendMessage()">Надіслати</button>
+    </div>
+  </div>
+
+</div>
+
+
+<script>
+/* ── CONFIG (узгодити з лідом n8n) ── */
+const CONFIG = {
+  venue: "bar",
+  webhookUrl: "https://[ДОМЕН-ВІД-ЛІДА]/webhook/smartorder-demo"
+};
+
+const DEMO_MODE  = false;
+const DEPT       = CONFIG.venue;
+const DEPT_LABEL = CONFIG.venue === 'bar' ? 'Бар' : 'Ресторан';
+const WEBHOOK_URL = CONFIG.webhookUrl;
+
+/* ── STATE ── */
+const _pendingOrders = {};
+let _mergedQueue = [];
+
+document.addEventListener('DOMContentLoaded', () => {
+  const now = new Date();
+  document.getElementById('cur-date').textContent =
+    now.toLocaleDateString('uk-UA', { weekday:'long', day:'numeric', month:'long' });
+  scrollBottom();
+});
+
+/* ── SEND ── */
+async function sendMessage() {
+  const input = document.getElementById('msg-input');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  autoResize(input);
+  appendUserMsg(text);
+  showTyping();
+
+  if (DEMO_MODE || !WEBHOOK_URL) {
+    await sleep(900 + Math.random() * 700);
+    removeTyping();
+    const parsed = parseDemoResponse(text);
+    appendDemoResponse(parsed);
+    return;
+  }
+
+  try {
+    const res = await fetch(WEBHOOK_URL, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ action: 'new_order', text, venue: CONFIG.venue, timestamp: new Date().toISOString() })
+    });
+    const data = await res.json();
+    removeTyping();
+    handleOrderResponse(data);
+  } catch(e) {
+    removeTyping();
+    appendError('Помилка з\'єднання. Спробуйте ще раз.');
+  }
+}
+
+/* ── HANDLE RESPONSE: show ALL items in one confirm card ── */
+function handleOrderResponse(data) {
+  const items = data.items || [];
+  if (!items.length) {
+    appendError('Жодної позиції не розпізнано. Спробуйте ще раз.');
+    return;
+  }
+
+  const chat = document.getElementById('chat');
+  const time = timeNow();
+  const id = 'order_' + Date.now();
+
+  // Store full data for later
+  _pendingOrders[id] = {
+    items: items,
+    week_id: data.week_id || '',
+    department: data.department || DEPT
+  };
+
+  // Build item lines
+  let lines = '';
+  items.forEach(item => {
+    const name = item.product || item.name || '';
+    const qty = item.quantity || item.qty || 0;
+    const unit = item.unit || '';
+    const status = item.status || 'new';
+
+    let badge = '';
+    let extra = '';
+    if (status === 'merged') {
+      badge = '<span class="flag merged">MERGED</span>';
+      extra = '<div style="font-size:11px;color:var(--text-mute);margin-top:2px;">Вже є: ' +
+        (item.existing_quantity || 0) + ' ' + escHtml(unit) + ' · буде оброблено окремо</div>';
+    } else if (status === 'cross') {
+      badge = '<span class="flag cross">CROSS</span>';
+    }
+
+    lines += '<div class="order-line" style="flex-wrap:wrap;">' +
+      '<span class="order-item">' + escHtml(name) + badge + '</span>' +
+      '<span class="order-qty">' + qty + ' ' + escHtml(unit) + '</span>' +
+      extra +
+      '</div>';
+  });
+
+  // Count new+cross vs merged
+  const newCross = items.filter(i => i.status !== 'merged');
+  const merged = items.filter(i => i.status === 'merged');
+  let footer = newCross.length + ' нових';
+  if (merged.length) footer += ' · ' + merged.length + ' дубл.';
+
+  chat.innerHTML +=
+    '<div class="msg in" id="' + id + '">' +
+      '<div class="response-card">' +
+        '<div class="r-header">ПІДТВЕРДИТИ ЗАМОВЛЕННЯ?</div>' +
+        lines +
+        '<div class="r-footer">' + footer + '</div>' +
+        '<div class="confirm-row">' +
+          '<button class="confirm-btn" onclick="wCancel(\'' + id + '\')">Скасувати</button>' +
+          '<button class="confirm-btn primary" onclick="wConfirm(\'' + id + '\')">Підтвердити</button>' +
+        '</div>' +
+      '</div>' +
+      '<div class="msg-meta">Система · ' + time + '</div>' +
+    '</div>';
+  scrollBottom();
+}
+
+/* ── CANCEL ALL ── */
+function wCancel(id) {
+  delete _pendingOrders[id];
+  const el = document.getElementById(id);
+  if (el) el.remove();
+  appendBubble('Замовлення скасоване.', 'var(--text-mute)');
+}
+
+/* ── CONFIRM: send new+cross to webhook, then queue merged dialogs ── */
+async function wConfirm(id) {
+  const order = _pendingOrders[id];
+  if (!order) return;
+  delete _pendingOrders[id];
+  const el = document.getElementById(id);
+  if (el) el.remove();
+
+  const items = order.items;
+  const newCrossItems = items.filter(i => i.status !== 'merged');
+  const mergedItems = items.filter(i => i.status === 'merged');
+
+  // 1. Confirm new+cross items
+  if (newCrossItems.length) {
+    showTyping();
+    try {
+      await fetch(WEBHOOK_URL, {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({
+          action: 'confirm',
+          venue: CONFIG.venue,
+          week_id: order.week_id,
+          items: newCrossItems
+        })
+      });
+      removeTyping();
+
+      // Show confirmed card
+      let lines = '';
+      newCrossItems.forEach(item => {
+        const name = item.product || item.name || '';
+        const qty = item.quantity || item.qty || 0;
+        const unit = item.unit || '';
+        const flagHtml = item.status === 'cross'
+          ? '<span class="flag cross">CROSS</span>' : '';
+        lines += '<div class="order-line">' +
+          '<span class="order-item">' + escHtml(name) + flagHtml + '</span>' +
+          '<span class="order-qty">' + qty + ' ' + escHtml(unit) + '</span>' +
+          '</div>';
+      });
+      const chat = document.getElementById('chat');
+      chat.innerHTML +=
+        '<div class="msg in"><div class="response-card">' +
+          '<div class="r-header">✓ ЗАМОВЛЕННЯ ПІДТВЕРДЖЕНО</div>' +
+          lines +
+          '<div class="r-footer">' + newCrossItems.length + ' позицій збережено · Sheets</div>' +
+        '</div><div class="msg-meta">Система · ' + timeNow() + '</div></div>';
+      scrollBottom();
+    } catch(e) {
+      removeTyping();
+      appendError('Помилка під час підтвердження.');
+    }
+  }
+
+  // 2. Queue merged items
+  if (mergedItems.length) {
+    _mergedQueue = mergedItems.slice();
+    showNextMerged();
+  }
+}
+
+/* ── MERGED QUEUE: show one merged dialog at a time ── */
+function showNextMerged() {
+  if (!_mergedQueue.length) return;
+
+  const item = _mergedQueue[0]; // peek, don't remove yet
+  const chat = document.getElementById('chat');
+  const time = timeNow();
+  const id = 'merged_' + Date.now();
+
+  const name = item.product || item.name || '';
+  const qty = item.quantity || item.qty || 0;
+  const unit = item.unit || '';
+  const existing = item.existing_quantity || 0;
+
+  chat.innerHTML +=
+    '<div class="msg in" id="' + id + '">' +
+      '<div class="response-card">' +
+        '<div class="r-header" style="color:var(--red)">⚠ ВЖЕ ІСНУЄ В ЗАМОВЛЕННІ</div>' +
+        '<div class="order-line">' +
+          '<span class="order-item">' + escHtml(name) + '<span class="flag merged">MERGED</span></span>' +
+          '<span class="order-qty">Зараз: ' + existing + ' ' + escHtml(unit) + '</span>' +
+        '</div>' +
+        '<div style="margin-top:10px;font-size:13px;color:var(--text-dim);">' +
+          'Додати ще <strong>' + qty + ' ' + escHtml(unit) + '</strong>?' +
+        '</div>' +
+        '<div class="confirm-row">' +
+          '<button class="confirm-btn" onclick="cancelMerged(\'' + id + '\')">Скасувати</button>' +
+          '<button class="confirm-btn primary" onclick="confirmMerged(\'' + id + '\',\'' + escAttr(name) + '\',' + qty + ',\'' + escAttr(unit) + '\',' + existing + ')">+ Додати</button>' +
+        '</div>' +
+      '</div>' +
+      '<div class="msg-meta">Система · ' + time + '</div>' +
+    '</div>';
+  scrollBottom();
+}
+
+/* ── CANCEL one merged item, move to next ── */
+function cancelMerged(id) {
+  const el = document.getElementById(id);
+  if (el) el.remove();
+  _mergedQueue.shift(); // remove current
+  appendBubble('Позицію пропущено.', 'var(--text-mute)');
+  if (_mergedQueue.length) {
+    setTimeout(showNextMerged, 400);
+  }
+}
+
+/* ── CONFIRM one merged item via add_more ── */
+async function confirmMerged(id, name, qty, unit, existing) {
+  const el = document.getElementById(id);
+  if (el) el.remove();
+  _mergedQueue.shift();
+
+  showTyping();
+  try {
+    await fetch(WEBHOOK_URL, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        action: 'add_more',
+        venue: CONFIG.venue,
+        product: name,
+        quantity: parseInt(qty),
+        unit: unit,
+        reason: 'Manual'
+      })
+    });
+    removeTyping();
+    const total = parseInt(existing) + parseInt(qty);
+    appendBubble('✓ ' + escHtml(name) + ': ' + existing + ' → ' + total + ' ' + escHtml(unit), 'var(--text)');
+  } catch(e) {
+    removeTyping();
+    appendError('Помилка оновлення ' + name + '.');
+  }
+
+  if (_mergedQueue.length) {
+    setTimeout(showNextMerged, 400);
+  }
+}
+
+/* ── UI HELPERS ── */
+function appendUserMsg(text) {
+  const chat = document.getElementById('chat');
+  chat.innerHTML +=
+    '<div class="msg out"><div class="bubble">' + escHtml(text) + '</div>' +
+    '<div class="msg-meta">' + DEPT_LABEL + ' · ' + timeNow() + '</div></div>';
+  scrollBottom();
+}
+
+let typingEl = null;
+function showTyping() {
+  const chat = document.getElementById('chat');
+  typingEl = document.createElement('div');
+  typingEl.className = 'msg in';
+  typingEl.innerHTML = '<div class="typing"><span></span><span></span><span></span></div>';
+  chat.appendChild(typingEl);
+  scrollBottom();
+}
+function removeTyping() { if(typingEl){ typingEl.remove(); typingEl=null; } }
+
+function appendBubble(html, color) {
+  const chat = document.getElementById('chat');
+  chat.innerHTML += '<div class="msg in"><div class="bubble" style="color:' + (color||'var(--text)') + '">' + html + '</div>' +
+    '<div class="msg-meta">Система · ' + timeNow() + '</div></div>';
+  scrollBottom();
+}
+
+function appendError(msg) {
+  const chat = document.getElementById('chat');
+  chat.innerHTML += '<div class="msg in"><div class="bubble" style="color:var(--red)">' + escHtml(msg) + '</div></div>';
+  scrollBottom();
+}
+
+/* ── DEMO PARSER (fallback) ── */
+const demoStock = {};
+function parseDemoResponse(text) {
+  const tokens = text.split(/[,;]+/).map(s=>s.trim()).filter(Boolean);
+  const items = [];
+  tokens.forEach(tok => {
+    const m = tok.match(/^(\d+)\s*(cx|caixas?|bt|garrafas?|bottles?|lt|litros?|un|units?|kg|g)?\s*(.+)?$/i);
+    if(m) {
+      const qty  = parseInt(m[1]);
+      const unit = (m[2]||'un').toLowerCase().replace(/s$/,'').replace('garraf','bt').replace('caixa','cx').replace('litro','lt').replace('bottle','bt').replace('unit','un');
+      const name = capitalize((m[3]||tok.replace(/^\d+\s*/,'')).trim());
+      const key  = name.toLowerCase();
+      if(demoStock[key]) {
+        return items.push({ name, qty, unit, flags:[], _dup:true, _existing:demoStock[key] });
+      }
+      demoStock[key] = qty;
+      items.push({ name, qty, unit, flags:[] });
+    }
+  });
+  return { items, summary: items.length + ' позицій · demo' };
+}
+
+function appendDemoResponse(data) {
+  const chat = document.getElementById('chat');
+  const time = timeNow();
+  let lines = '';
+  (data.items||[]).forEach(item => {
+    lines += '<div class="order-line"><span class="order-item">' + escHtml(item.name||'') + '</span>' +
+      '<span class="order-qty">' + (item.qty||'') + ' ' + escHtml(item.unit||'') + '</span></div>';
+  });
+  chat.innerHTML +=
+    '<div class="msg in"><div class="response-card"><div class="r-header">✓ ЗАМОВЛЕННЯ ЗАРЕЄСТРОВАНЕ</div>' +
+    lines + '<div class="r-footer">' + escHtml(data.summary||'') + '</div></div>' +
+    '<div class="msg-meta">Система · ' + time + '</div></div>';
+  scrollBottom();
+}
+
+/* ── UTILS ── */
+function handleKey(e) { if(e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); sendMessage(); } }
+function autoResize(el) { el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,100)+'px'; }
+function scrollBottom() { const c=document.getElementById('chat'); setTimeout(()=>c.scrollTop=c.scrollHeight,50); }
+function sleep(ms) { return new Promise(r=>setTimeout(r,ms)); }
+function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function escAttr(s) { return String(s).replace(/'/g,"\\'").replace(/"/g,'&quot;'); }
+function capitalize(s) { return s.charAt(0).toUpperCase()+s.slice(1); }
+function timeNow() { return new Date().toLocaleTimeString('uk-UA',{hour:'2-digit',minute:'2-digit'}); }
+
+</script>
+</body>
+</html>
