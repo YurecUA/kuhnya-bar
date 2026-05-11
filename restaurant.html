@@ -77,7 +77,13 @@ header {
   display: flex;
   align-items: center;
   gap: 12px;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
 }
+.logo-wrap:hover { opacity: 0.85; }
+.logo-wrap:active { opacity: 0.7; }
 
 .logo-mark {
   height: 44px;
@@ -414,16 +420,18 @@ header {
   <header>
     
     <div class="header-main">
-      <div class="logo-wrap">
+      <a href="/" class="logo-wrap" aria-label="На головну">
         <div class="logo-mark">
-          <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-label="Кухня та бар">
-            <rect x="4" y="6" width="92" height="4" fill="currentColor"/>
-            <rect x="4" y="86" width="92" height="3" fill="currentColor"/>
-            <text x="22" y="68" font-family="'Playfair Display', serif" font-size="56" font-weight="700" fill="currentColor" text-anchor="middle">К</text>
-            <text x="78" y="68" font-family="'Playfair Display', serif" font-size="56" font-weight="700" fill="currentColor" text-anchor="middle">Л</text>
+          <svg viewBox="0 0 110 100" xmlns="http://www.w3.org/2000/svg" aria-label="Кухня та бар">
+            <rect x="3" y="4" width="104" height="3" fill="currentColor"/>
+            <rect x="3" y="93" width="104" height="2.5" fill="currentColor"/>
+            <text x="20" y="78" font-family="'Playfair Display', serif" font-size="74" font-weight="700" fill="currentColor" text-anchor="middle">К</text>
+            <g transform="translate(110, 0) scale(-1, 1)">
+              <text x="20" y="78" font-family="'Playfair Display', serif" font-size="74" font-weight="700" fill="currentColor" text-anchor="middle">К</text>
+            </g>
             <g fill="currentColor">
-              <rect x="48" y="14" width="4" height="14" rx="0.5"/>
-              <path d="M 42 28 Q 42 25 45 25 L 55 25 Q 58 25 58 28 L 58 84 L 42 84 Z"/>
+              <rect x="53" y="22" width="4" height="13"/>
+              <path d="M 47 35 Q 47 32 50 32 L 60 32 Q 63 32 63 35 L 63 89 L 47 89 Z"/>
             </g>
           </svg>
         </div>
@@ -431,10 +439,10 @@ header {
         <span class="logo-text">Кухня &amp; бар</span>
         <div class="dept-label">Замовлення · Ресторан</div>
         </div>
-      </div>
+      </a>
       <div class="dept-badge">
         <span class="demo-tag">demo</span>
-        <div class="dept-pill">Bar</div>
+        <div class="dept-pill">Restaurant</div>
         <div class="online-dot"></div>
       </div>
     </div>
@@ -474,7 +482,7 @@ header {
 /* ── CONFIG (узгодити з лідом n8n) ── */
 const CONFIG = {
   venue: "restaurant",
-  webhookUrl: "https://webhook.site/7e523823-809f-4a0c-8e53-e42bf9ea8d3f"
+  webhookUrl: "https://[ДОМЕН-ВІД-ЛІДА]/webhook/smartorder-demo"
 };
 
 const DEMO_MODE  = false;
@@ -517,9 +525,26 @@ async function sendMessage() {
       headers: {'Content-Type':'application/json'},
       body: JSON.stringify({ action: 'new_order', text, venue: CONFIG.venue, timestamp: new Date().toISOString() })
     });
-    const data = await res.json();
     removeTyping();
-    handleOrderResponse(data);
+
+    if (!res.ok) {
+      appendError('Помилка сервера (HTTP ' + res.status + '). Спробуйте ще раз.');
+      return;
+    }
+
+    const raw = await res.text();
+    if (!raw || raw.trim() === '' || raw.trim() === 'OK' || raw.trim().toLowerCase() === 'success') {
+      // Empty / plain-text response — webhook.site or n8n without response body
+      appendBubble('✓ Запит надіслано (тестовий режим — n8n response порожній)', 'var(--text-mute)');
+      return;
+    }
+
+    try {
+      const data = JSON.parse(raw);
+      handleOrderResponse(data);
+    } catch(jsonErr) {
+      appendBubble('✓ Запит надіслано (response не JSON)', 'var(--text-mute)');
+    }
   } catch(e) {
     removeTyping();
     appendError('Помилка з\'єднання. Спробуйте ще раз.');
